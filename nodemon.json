@@ -1,0 +1,10 @@
+{
+  "watch": ["src/*"],
+  "exec": "npm run serve",
+  "ext": "ts",
+  "verbose": true,
+  "ignore": [
+    "*/**/*.test.ts",
+    "build"
+  ]
+}
