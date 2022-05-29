@@ -34,7 +34,7 @@ const registerUser: Handler = async (req: ExtendedRequest, res, next) => {
     const hashedPassword = await CryptoJS.AES.encrypt(password, config.tokenSecretKey).toString();
 
     const newUser = await userBase.save({
-      role,
+      role: role.toLowerCase(),
       firstName,
       lastName,
       email,
