@@ -1,6 +1,8 @@
-import express from "express";
-import appRoutes from "./routes/appRoutes";
-import type from "./type"
+import express from 'express';
+import appRoutes from './routes/appRoutes';
+import { catchError } from './middlewares/catchError';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type from './type';
 
 const app = express();
 
@@ -9,8 +11,6 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/api', appRoutes);
 
-app.use((err,req,res,next)=>{
-    res.status(err.status).json({message: err.message, status: err.status})
-});
+app.use(catchError);
 
 export default app;

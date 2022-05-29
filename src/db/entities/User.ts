@@ -3,8 +3,8 @@ import {
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
-  UpdateDateColumn
-} from "typeorm"
+  UpdateDateColumn,
+} from 'typeorm';
 
 export enum UserRolesENUM {
   user = 'user',
@@ -14,7 +14,7 @@ export enum UserRolesENUM {
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
-  id: number
+  id: number;
 
   @Column({
     type: 'enum',
@@ -22,48 +22,47 @@ export class User {
     default: UserRolesENUM.user,
     nullable: false,
   })
-  role: string
+  role: string;
 
   @Column({
     type: 'varchar',
     nullable: false,
   })
-  firstName: string
+  firstName: string;
 
   @Column({
     type: 'varchar',
     nullable: false,
   })
-  lastName: string
+  lastName: string;
 
   @Column({
     type: 'varchar',
     nullable: false,
     unique: true,
   })
-  email: string
+  email: string;
 
   @Column({
     type: 'varchar',
     nullable: true,
     // select: false,
   })
-  password: string
+  password: string;
 
   @Column({
     type: 'date',
     nullable: false,
   })
-  dob: string
+  dob: string;
 
   @Column()
   @CreateDateColumn()
-  createdAt: Date
+  createdAt: Date;
 
   @Column()
   @UpdateDateColumn()
-  updatedAt: Date
-
+  updatedAt: Date;
 }
 
-export default User
+export default User;

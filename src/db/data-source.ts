@@ -1,7 +1,7 @@
-import "reflect-metadata";
-import { DataSource } from "typeorm";
-import { User } from "./entity/User";
-import config from "../config";
+import 'reflect-metadata';
+import { DataSource } from 'typeorm';
+import { User } from './entities/User';
+import config from '../config';
 
 export const AppDataSource = new DataSource({
   type: config.db.type,
@@ -15,11 +15,11 @@ export const AppDataSource = new DataSource({
   entities: [User],
   migrations: [],
   subscribers: [],
-})
+});
 
 export const connect = () => {
   const connection = AppDataSource.initialize();
+  console.error('Data Source has been initialized!');
 
   return connection;
-}
-
+};

@@ -1,8 +1,18 @@
-import { Handler } from "express";
-import argon2 = require("argon2");
-import { userBase } from "../../db";
+import { Handler, Request } from 'express';
+import CryptoJS from 'crypto-js';
+import { userBase } from '../../db';
+import config from '../../config';
 
-const editUser: Handler = async (req, res, next) => {
+type ExtendedRequest = Request<unknown, unknown, {
+  role: string;
+  firstName: string;
+  lastName:string;
+  email: string;
+  password: string;
+  dob:string;
+}>
+
+const editUser: Handler = async (req: ExtendedRequest, res, next) => {
   try {
     const {
       role,
@@ -10,10 +20,10 @@ const editUser: Handler = async (req, res, next) => {
       lastName,
       email,
       password,
-      dob
+      dob,
     } = req.body;
 
-    const hashedPassword = await argon2.hash(password);
+    const hashedPassword = await CryptoJS.AES.encrypt(password, config.tokenSecretKey).toString();
 
     await userBase.update(req.user.id, {
       role,
@@ -21,19 +31,20 @@ const editUser: Handler = async (req, res, next) => {
       lastName,
       email,
       password: hashedPassword,
-      dob
+      dob,
     });
 
-    const getRefreshedUser = await userBase.findOne({ where: { id: req.user.id }});
+    const getRefreshedUser = await userBase.findOne({ where: { id: req.user.id } });
 
     delete getRefreshedUser.password;
 
     res.status(200).json(getRefreshedUser);
-
   } catch (e) {
-    console.log("Error editUser service");
+    if (!e.text) {
+      e.text = 'Error  editUser service';
+    }
     next(e);
   }
-}
+};
 
 export default editUser;
