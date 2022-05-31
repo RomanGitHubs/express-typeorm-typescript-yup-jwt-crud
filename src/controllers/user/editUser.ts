@@ -2,39 +2,48 @@ import { Handler, Request } from 'express';
 import CryptoJS from 'crypto-js';
 import { userBase } from '../../db';
 import config from '../../config';
+import generateError from '../../utils/generateError';
 
 type ExtendedRequest = Request<unknown, unknown, {
-  role: string;
-  firstName: string;
-  lastName:string;
-  email: string;
-  password: string;
-  dob:string;
+  role?: string;
+  name?: string;
+  email?: string;
+  password?: string;
+  newPassword?: string;
 }>
 
 const editUser: Handler = async (req: ExtendedRequest, res, next) => {
   try {
     const {
       role,
-      firstName,
-      lastName,
+      name,
       email,
       password,
-      dob,
+      newPassword
     } = req.body;
 
-    const hashedPassword = await CryptoJS.AES.encrypt(password, config.tokenSecretKey).toString();
+    const getRefreshedUser = await userBase.findOne({ where: { id: req.user.id } });
+    let hashedPassword = getRefreshedUser.password
 
+    if (password){
+      const isPasswordCorrect = await CryptoJS.AES.decrypt(getRefreshedUser.password
+        .toString(), config.tokenSecretKey).toString(CryptoJS.enc.Utf8);
+      console.log('asd', isPasswordCorrect);
+    
+    if (isPasswordCorrect !== password) {
+      throw generateError('Wrong password', 403);
+    }
+
+      hashedPassword = await CryptoJS.AES.encrypt(newPassword, config.tokenSecretKey).toString();
+    
+    }
     await userBase.update(req.user.id, {
       role,
-      firstName,
-      lastName,
+      name,
       email,
       password: hashedPassword,
-      dob,
     });
 
-    const getRefreshedUser = await userBase.findOne({ where: { id: req.user.id } });
 
     delete getRefreshedUser.password;
 

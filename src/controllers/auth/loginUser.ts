@@ -9,18 +9,24 @@ type ExtendedRequest = Request<unknown, unknown, { email: string; password: stri
 
 const loginUser: Handler = async (req: ExtendedRequest, res, next) => {
   const { email, password } = req.body;
+  console.log(req.body);
 
   try {
     const user = await userBase.findOne({ where: { email } });
 
-    if (!email) {
+    if (!user) {
       throw generateError('User not exist', 404);
     }
+    console.log(password);
 
+    console.log(user.password);
+    
     const isPasswordCorrect = await CryptoJS.AES
-      .decrypt(password.toString(), config.tokenSecretKey).toString(CryptoJS.enc.Utf8);
+      .decrypt(user.password.toString(), config.tokenSecretKey).toString(CryptoJS.enc.Utf8);
+    console.log('asd', isPasswordCorrect);
+    
 
-    if (!isPasswordCorrect) {
+    if (isPasswordCorrect !== password) {
       throw generateError('Wrong password', 403);
     }
 

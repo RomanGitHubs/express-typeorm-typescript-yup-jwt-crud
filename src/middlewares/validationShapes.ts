@@ -32,16 +32,16 @@ const warningDob = {
 
 const registerUserSchema = yup.object({
   body: yup.object({
-    role: yup.string().max(10, warningRole.max).required(warningRole.required),
-    firstName: yup.string().matches(regexName, warningFirstName.matches)
-      .max(15, warningFirstName.max).required(warningFirstName.required),
-    lastName: yup.string().matches(regexName, warningLastName.matches)
-      .max(15, warningLastName.max).required(warningLastName.required),
+    // role: yup.string().max(10, warningRole.max).required(warningRole.required),
+    // firstName: yup.string().matches(regexName, warningFirstName.matches)
+      // .max(15, warningFirstName.max).required(warningFirstName.required),
+    // lastName: yup.string().matches(regexName, warningLastName.matches)
+      // .max(15, warningLastName.max).required(warningLastName.required),
     email: yup.string().email(warningEmail.email).max(30, warningEmail.max)
       .required(warningEmail.required),
     password: yup.string().matches(regexPassword, warningPassword.matches)
       .min(6, warningPassword.min).required(warningPassword.required),
-    dob: yup.date().required(warningDob),
+    // dob: yup.date().required(warningDob),
   }),
 });
 
@@ -55,13 +55,11 @@ const loginUserScheme = yup.object({
 const editUserSchema = yup.object({
   body: yup.object({
     role: yup.string().max(10, warningRole.max),
-    firstName: yup.string().matches(regexName, warningFirstName.matches)
+    name: yup.string().matches(regexName, warningFirstName.matches)
       .max(15, warningFirstName.max),
-    lastName: yup.string().matches(regexName, warningLastName.matches).max(15, warningLastName.max),
     email: yup.string().email(warningEmail.email).max(30, warningEmail.max),
     password: yup.string().matches(regexPassword, warningPassword.matches)
       .min(6, warningPassword.min),
-    dob: yup.date(),
   }),
 });
 

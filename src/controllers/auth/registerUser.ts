@@ -6,22 +6,16 @@ import { userBase } from '../../db';
 import config from '../../config';
 
 type ExtendedRequest = Request<unknown, unknown, {
-  role: string;
-  firstName: string;
-  lastName:string;
   email: string;
   password: string;
-  dob:string;
 }>
 
 const registerUser: Handler = async (req: ExtendedRequest, res, next) => {
+  console.log(req.body);
+  
   const {
-    role,
-    firstName,
-    lastName,
     email,
     password,
-    dob,
   } = req.body;
 
   try {
@@ -34,15 +28,13 @@ const registerUser: Handler = async (req: ExtendedRequest, res, next) => {
     const hashedPassword = await CryptoJS.AES.encrypt(password, config.tokenSecretKey).toString();
 
     const newUser = await userBase.save({
-      role: role.toLowerCase(),
-      firstName,
-      lastName,
+
       email,
       password: hashedPassword,
-      dob,
+
     });
 
-    const user = { role, firstName, lastName, email, dob };
+    const user = {email: newUser.email, id: newUser.id };
 
     const accessToken = await signToken({ id: newUser.id });
 

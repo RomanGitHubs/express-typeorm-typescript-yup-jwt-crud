@@ -9,6 +9,7 @@ type errorObj = {
 const validate = (schema): Handler => {
   return async (req, res, next) => {
     try {
+      
       await schema.validate({
         body: req.body,
         query: req.query,

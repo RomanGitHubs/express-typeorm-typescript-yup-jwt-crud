@@ -26,15 +26,9 @@ export class User {
 
   @Column({
     type: 'varchar',
-    nullable: false,
+    nullable: true,
   })
-  firstName: string;
-
-  @Column({
-    type: 'varchar',
-    nullable: false,
-  })
-  lastName: string;
+  name: string;
 
   @Column({
     type: 'varchar',
@@ -45,16 +39,16 @@ export class User {
 
   @Column({
     type: 'varchar',
-    nullable: true,
+    nullable: false,
     // select: false,
   })
   password: string;
 
   @Column({
-    type: 'date',
-    nullable: false,
+    type: 'varchar',
+    nullable: true,
   })
-  dob: string;
+  photo: string;
 
   @Column()
   @CreateDateColumn()
