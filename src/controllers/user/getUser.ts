@@ -5,7 +5,7 @@ type ExtendedRequest = Request<unknown, unknown, {id: number}>
 
 const getUser: Handler = async (req: ExtendedRequest, res, next) => {
   try {
-    const user = await userBase.findOne({ where: { id: req.body.id } });
+    const user = await userBase.findOne({ where: { id: req.user.id } });
 
     delete user.password;
 

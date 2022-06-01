@@ -13,6 +13,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/api', appRoutes);
+app.use('/static', express.static(__dirname + '/public'));
 
 app.use(catchError);
 

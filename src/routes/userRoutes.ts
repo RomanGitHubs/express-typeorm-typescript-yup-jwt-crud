@@ -3,6 +3,7 @@ import editUser from '../controllers/user/editUser';
 import getAllUser from '../controllers/user/getAllUsers';
 import getUser from '../controllers/user/getUser';
 import removeUser from '../controllers/user/removeUser';
+import uploadPhoto from '../controllers/user/uploadPhoto';
 import validate from '../middlewares/validation';
 import { editUserSchema, getAllUsers } from '../middlewares/validationShapes';
 import verifyAccess from '../middlewares/verifyAccess';
@@ -14,5 +15,7 @@ userRoutes.get('/', verifyAccess, getUser);
 userRoutes.get('/all', validate(getAllUsers), getAllUser);
 userRoutes.put('/edit', validate(editUserSchema), verifyAccess, editUser);
 userRoutes.delete('/remove', verifyAccess, verifyPermission, removeUser);
+userRoutes.put('/uploadphoto', verifyAccess, uploadPhoto);
+
 
 export default userRoutes;
