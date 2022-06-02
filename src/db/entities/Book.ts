@@ -4,47 +4,39 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
-  OneToMany,
+  ManyToOne,
 } from 'typeorm';
-import Book from './Book';
-
-export enum UserRolesENUM {
-  user = 'user',
-  admin = 'admin',
-}
+import User from './User';
 
 @Entity()
-export class User {
+export class Book {
+
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column({
-    type: 'enum',
-    enum: UserRolesENUM,
-    default: UserRolesENUM.user,
+    type: 'varchar',
     nullable: false,
   })
-  role: string;
-
-  @Column({
-    type: 'varchar',
-    nullable: true,
-  })
-  name: string;
+  author: string;
 
   @Column({
     type: 'varchar',
     nullable: false,
-    unique: true,
   })
-  email: string;
+  title: string;
 
   @Column({
     type: 'varchar',
     nullable: false,
-    // select: false,
   })
-  password: string;
+  description: string;
+
+  @Column({
+    type: 'varchar',
+    nullable: false,
+  })
+  raiting: number;
 
   @Column({
     type: 'varchar',
@@ -52,8 +44,20 @@ export class User {
   })
   photo: string;
 
-  @OneToMany(() => Book, (book) => book.user)
-    public books: Book[];
+  @Column({
+    type: 'varchar',
+    nullable: true,
+  })
+  cover: string;
+
+  @Column({
+    type: 'varchar',
+    nullable: true,
+  })
+  price: number;
+
+  @ManyToOne(() => User, (user) => user.books)
+  public user: User;
 
   @Column()
   @CreateDateColumn()
@@ -64,4 +68,4 @@ export class User {
   updatedAt: Date;
 }
 
-export default User;
+export default Book;

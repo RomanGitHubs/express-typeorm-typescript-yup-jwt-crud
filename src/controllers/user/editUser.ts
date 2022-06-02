@@ -23,31 +23,45 @@ const editUser: Handler = async (req: ExtendedRequest, res, next) => {
     } = req.body;
 
     const getRefreshedUser = await userBase.findOne({ where: { id: req.user.id } });
-    let hashedPassword = getRefreshedUser.password
+    const hashedPassword = getRefreshedUser.password
+    console.log('New PW >> ', newPassword);
+    
 
     if (password){
-      const isPasswordCorrect = await CryptoJS.AES.decrypt(getRefreshedUser.password
+      const isPasswordCorrect = await CryptoJS.AES.decrypt(hashedPassword
         .toString(), config.tokenSecretKey).toString(CryptoJS.enc.Utf8);
       console.log('asd', isPasswordCorrect);
     
-    if (isPasswordCorrect !== password) {
-      throw generateError('Wrong password', 403);
-    }
+      if (isPasswordCorrect !== password) {
+        throw generateError('Wrong password', 403);
+      } 
 
-      hashedPassword = await CryptoJS.AES.encrypt(newPassword, config.tokenSecretKey).toString();
+      const newHeshedPassword = await CryptoJS.AES.encrypt(newPassword, config.tokenSecretKey).toString();
+      
+      await userBase.update(req.user.id, {
+        role,
+        name,
+        email,
+        password: newHeshedPassword,
+      });
+
+      delete getRefreshedUser.password;
     
+      res.status(200).json(getRefreshedUser);
     }
+    
     await userBase.update(req.user.id, {
       role,
       name,
       email,
-      password: hashedPassword,
     });
 
-
+    console.log(getRefreshedUser);
     delete getRefreshedUser.password;
-
-    res.status(200).json(getRefreshedUser);
+    delete getRefreshedUser.createdAt;
+    delete getRefreshedUser.updatedAt;
+    
+    res.status(200).json({ user: getRefreshedUser });
   } catch (e) {
     if (!e.text) {
       e.text = 'Error  editUser service';

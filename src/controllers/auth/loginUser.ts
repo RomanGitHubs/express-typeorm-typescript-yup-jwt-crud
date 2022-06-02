@@ -31,6 +31,8 @@ const loginUser: Handler = async (req: ExtendedRequest, res, next) => {
     }
 
     delete user.password;
+    delete user.createdAt;
+    delete user.updatedAt;
 
     const accessToken = await signToken({ id: user.id });
 

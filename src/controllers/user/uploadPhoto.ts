@@ -2,6 +2,7 @@ import { Handler, Request } from 'express';
 import { userBase } from '../../db';
 import * as fs from 'node:fs';
 import { v4 as uuidv4 } from 'uuid';
+import generateError from '../../utils/generateError';
 
 
 
@@ -15,43 +16,35 @@ const uploadPhoto: Handler = async (req: ExtendedRequest, res, next) => {
       file,
     } = req.body;
 
-    console.log(file);
-    console.log(typeof(file));
+    if (typeof (file) !== 'string') {
+      throw generateError('Ti pihaech kakuyto dich', 400);
+    }
 
-    const extention = file.split('+')[0].split('/')[1];
+    console.log('TypeOF >> ', typeof (file));
 
-    const cut = file.split(',')[1];
+    const payload = file.split(',')[1];
 
-    fs.writeFile(`tresh.${extention}`, cut, 'base64', (e)=>{console.log(e)});
+    const extension = file.split(';')[0].split('/')[1];
+    const fileName = uuidv4();
 
-    // })
-    // const decoded = atob.
-    // console.log(1);
-    // readableStream.pipe(writeableStream);
+    const fullName = `${fileName}.${extension}`
 
-    // console.log(writeableStream);
-    
-    // console.log(2);
 
-    // writeableStream.on("finish", () => {
-    //   writeableStream.close();
-    //   console.log("Download Completed");
-    // });
+    await fs.promises.writeFile(`src/public/${fullName}`, payload, 'base64');
 
-    // console.log(22);
+    await userBase.update(req.user.id, {
+      photo: fullName,
+    });
+    console.log(fullName);
 
-    // await userBase.update(req.user.id, {
-    //   photo: path,
-    // });
-    // console.log(3);
+    const refreshedUser = await userBase.findOne({ where: { id: req.user.id } });
+    delete refreshedUser.password;
+    delete refreshedUser.createdAt;
+    delete refreshedUser.updatedAt;
 
-    // const getRefreshedUser = await userBase.findOne({ where: { id: req.user.id } });
-    // console.log(4);
+    console.log(refreshedUser);
 
-    // delete getRefreshedUser.password;
-    // console.log(5);
-
-    // res.status(200).json(getRefreshedUser.photo);
+    res.status(200).json({ user: refreshedUser });
   } catch (e) {
     if (!e.text) {
       e.text = 'Error  uploadPhoto service';
