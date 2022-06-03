@@ -59,13 +59,7 @@ export class Book {
   @ManyToOne(() => User, (user) => user.books)
   public user: User;
 
-  @Column()
-  @CreateDateColumn()
-  createdAt: Date;
 
-  @Column()
-  @UpdateDateColumn()
-  updatedAt: Date;
 }
 
 export default Book;

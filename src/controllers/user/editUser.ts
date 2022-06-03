@@ -25,6 +25,8 @@ const editUser: Handler = async (req: ExtendedRequest, res, next) => {
     const getRefreshedUser = await userBase.findOne({ where: { id: req.user.id } });
     const hashedPassword = getRefreshedUser.password
     console.log('New PW >> ', newPassword);
+    console.log(req.body);
+    
     
 
     if (password){
@@ -47,7 +49,7 @@ const editUser: Handler = async (req: ExtendedRequest, res, next) => {
 
       delete getRefreshedUser.password;
     
-      res.status(200).json(getRefreshedUser);
+      res.status(200).json({ user: getRefreshedUser });
     }
     
     await userBase.update(req.user.id, {
