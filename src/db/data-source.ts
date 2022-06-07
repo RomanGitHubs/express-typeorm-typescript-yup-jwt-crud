@@ -3,6 +3,7 @@ import { DataSource } from 'typeorm';
 import { User } from './entities/User';
 import { Book } from './entities/Book';
 import config from '../config';
+import Genre from './entities/Genre';
 
 export const AppDataSource = new DataSource({
   type: config.db.type,
@@ -13,7 +14,7 @@ export const AppDataSource = new DataSource({
   database: config.db.database,
   synchronize: false,
   logging: false,
-  entities: [User, Book],
+  entities: [User, Book, Genre],
   migrations: [],
   subscribers: [],
 });

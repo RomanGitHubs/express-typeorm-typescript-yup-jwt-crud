@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  AfterLoad,
 } from 'typeorm';
 import Book from './Book';
 
@@ -61,6 +62,11 @@ export class User {
   @Column()
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @AfterLoad()
+  updateCounters() {
+    this.photo = `http://localhost:5000/static/${this.photo}`;
+  }
 }
 
 export default User;
