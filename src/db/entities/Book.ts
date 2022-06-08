@@ -97,7 +97,7 @@ export class Book {
   @AfterLoad()
   updateCounters() {
     this.photo = `http://localhost:5000/static/${this.photo}`;
-}
+  }
 
 }
 
