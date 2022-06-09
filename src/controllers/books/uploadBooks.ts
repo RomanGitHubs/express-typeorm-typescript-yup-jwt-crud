@@ -3,6 +3,7 @@ import CryptoJS from 'crypto-js';
 import generateError from '../../utils/generateError';
 import { signToken } from '../../utils/token';
 import { bookBase } from '../../db';
+import { genreBase } from '../../db';
 import config from '../../config';
 
 type ExtendedRequest = Request<unknown, unknown, {
@@ -17,6 +18,7 @@ type ExtendedRequest = Request<unknown, unknown, {
   isFavorite?: boolean;
   news?: boolean;
   bestsaller?: boolean;
+  // genres?: number[];
 }>
 
 const uploadBook: Handler = async (req: ExtendedRequest, res, next) => {
@@ -34,14 +36,19 @@ const uploadBook: Handler = async (req: ExtendedRequest, res, next) => {
     isFavorite,
     news,
     bestsaller,
+    // genres,
   } = req.body;
 
   try {
     const existingBook = await bookBase.findOne({ where: { title } });
-
+    
     if (existingBook) {
       throw generateError('This book already exist', 409);
     }
+    // for (let i = 0; i < genres.length; i++) {
+
+    // }
+    // const existingGenre = await genreBase.findOne({ where: { id: genres } });
 
     const newBook = await bookBase.save({
       photo,
@@ -55,6 +62,7 @@ const uploadBook: Handler = async (req: ExtendedRequest, res, next) => {
       isFavorite,
       news,
       bestsaller,
+      // genres: genres
     });
 
     res.status(200).json({ newBook });

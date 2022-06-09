@@ -2,30 +2,37 @@ import { Handler } from 'express';
 import generateError from '../../utils/generateError';
 import { bookBase } from '../../db';
 import { genreBase } from '../../db';
+import { In } from 'typeorm';
 
 const getAllBooks: Handler = async (req, res, next) => {
   try {
-    let books = await bookBase.find();
-    console.log(req.query);
-    
-    // if (req.query) {
-    //   const books = await bookBase
-    //   .createQueryBuilder("book")
-    //   .where("book.id = :id", req.query)
-    //   .getOne()
-    //   console.log('2',books);
-    //   return res.status(200).json(books);
-    // }
+    console.log('Query >>> ', req.query);
+    const splitQueryGenres = []
 
-    
-    console.log('1', books.length );
-
-    if (books.length == 0) {
-      throw generateError('Empty store', 404);
+    if (req.query.genre) {
+      const genresFilter = req.query.genre
+      for (let i = 0; i < genresFilter.length; i++, i++) {
+        splitQueryGenres.push(genresFilter[i])
+      }
     }
-    console.log('2',books);
-    console.log('2',req.query);
+    console.log(splitQueryGenres);
+    
+    const findForQuery = {
+      select: {
 
+      },
+      relations: {
+        genres: true,
+      },
+      where: {
+        genres: {
+          id: In(splitQueryGenres),
+        }
+      }
+    };
+
+    const books = await bookBase.find(req.query.genre ? findForQuery : null);
+  
     res.status(200).json(books);
   } catch (e) {
     if (!e.text) {
