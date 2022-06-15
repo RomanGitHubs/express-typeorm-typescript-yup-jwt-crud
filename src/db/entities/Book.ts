@@ -84,6 +84,12 @@ export class Book {
   })
   bestsaller: boolean;
 
+  @Column({
+    type: 'date',
+    nullable: true,   
+  })
+  date: Date;
+
   @ManyToMany(type => Genre, {
   cascade: true
   })

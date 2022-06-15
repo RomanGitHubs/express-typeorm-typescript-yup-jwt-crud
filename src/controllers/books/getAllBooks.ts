@@ -10,10 +10,12 @@ const getAllBooks: Handler = async (req, res, next) => {
     const splitQueryGenres = []
     let minPrice = 0;
     let maxPrice = 10000;
+    let sort = '';
     let queryForFind = {};
 
     console.log('Genre  >>> ', typeof(req.query.genre));
     console.log('Price >>> ', typeof(req.query.price));
+    console.log('Sort >>> ', typeof(req.query.sort));
     
 
     if (req.query.genre) {
@@ -32,7 +34,11 @@ const getAllBooks: Handler = async (req, res, next) => {
    console.log('Min >>> ', minPrice);
    console.log('Max >>> ', maxPrice);
    
-
+    if (req.query.sort) {
+      sort = `${req.query.sort}`;
+    }
+    console.log(sort);
+    
 
     if (req.query.genre) {
       queryForFind = {
@@ -61,7 +67,15 @@ const getAllBooks: Handler = async (req, res, next) => {
       };
     }
 
-    if (req.query.genre && req.query.price) {
+    if (req.query.sort) {
+      queryForFind = {
+        order: {
+          [sort]: "ASC",
+        }
+      };
+    }
+
+    if (req.query.genre && req.query.price && req.query.sort) {
       queryForFind = {
         select: {
         },
@@ -73,6 +87,9 @@ const getAllBooks: Handler = async (req, res, next) => {
             id: In(splitQueryGenres),
           },
           price: Between(minPrice, maxPrice),
+        },
+        order: {
+          [sort]: "ASC",
         }
       };
     }

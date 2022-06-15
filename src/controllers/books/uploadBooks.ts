@@ -18,6 +18,7 @@ type ExtendedRequest = Request<unknown, unknown, {
   isFavorite?: boolean;
   news?: boolean;
   bestsaller?: boolean;
+  date?: Date;
   // genres?: number[];
 }>
 
@@ -36,6 +37,7 @@ const uploadBook: Handler = async (req: ExtendedRequest, res, next) => {
     isFavorite,
     news,
     bestsaller,
+    date
     // genres,
   } = req.body;
 
@@ -62,6 +64,7 @@ const uploadBook: Handler = async (req: ExtendedRequest, res, next) => {
       isFavorite,
       news,
       bestsaller,
+      date
       // genres: genres
     });
 
