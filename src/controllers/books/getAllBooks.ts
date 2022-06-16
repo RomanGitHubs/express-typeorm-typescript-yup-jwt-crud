@@ -2,12 +2,17 @@ import { Handler } from 'express';
 import generateError from '../../utils/generateError';
 import { bookBase } from '../../db';
 import { genreBase } from '../../db';
-import { Between, In, LessThan, MoreThan } from 'typeorm';
+import { Between, In } from 'typeorm';
 
 const getAllBooks: Handler = async (req, res, next) => {
   try {
     console.log('Query >>> ', req.query);
-    const splitQueryGenres = []
+    const genres = await genreBase.find();
+    console.log( genres);
+
+    let splitQueryGenres = genres.map((item => item.id))
+    console.log(splitQueryGenres);
+    
     let minPrice = 0;
     let maxPrice = 10000;
     let sort = '';
@@ -20,8 +25,9 @@ const getAllBooks: Handler = async (req, res, next) => {
 
     if (req.query.genre) {
       const genresFilter = `${req.query.genre}`.split(',')
+      splitQueryGenres = []
       for (let i = 0; i < genresFilter.length; i++) {
-        splitQueryGenres.push(genresFilter[i])
+        splitQueryGenres.push(+genresFilter[i])
       }
     }
     console.log('Genres >>> ', splitQueryGenres);
@@ -31,8 +37,8 @@ const getAllBooks: Handler = async (req, res, next) => {
       minPrice = +prices[0] / 100;
       maxPrice = +prices[1] / 100;
     }
-   console.log('Min >>> ', minPrice);
-   console.log('Max >>> ', maxPrice);
+    console.log('Min >>> ', minPrice);
+    console.log('Max >>> ', maxPrice);
    
     if (req.query.sort) {
       sort = `${req.query.sort}`;
@@ -40,61 +46,24 @@ const getAllBooks: Handler = async (req, res, next) => {
     console.log(sort);
     
 
-    if (req.query.genre) {
-      queryForFind = {
-        select: {
+    const books = await bookBase.find({
+      select: {
+      },
+      relations: {
+        genres: true,
+      },
+      where: {
+        genres: {
+          id: In(splitQueryGenres),
         },
-        relations: {
-          genres: true,
-        },
-        where: {
-          genres: {
-            id: In(splitQueryGenres),
-          },
-        }
-      };
-    }
-   
-    if (req.query.price) {
-      queryForFind = {
-        select: {
-        },
-        relations: {
-        },
-        where: {
-          price: Between(minPrice, maxPrice),
-        }
-      };
-    }
-
-    if (req.query.sort) {
-      queryForFind = {
-        order: {
-          [sort]: "ASC",
-        }
-      };
-    }
-
-    if (req.query.genre && req.query.price && req.query.sort) {
-      queryForFind = {
-        select: {
-        },
-        relations: {
-          genres: true,
-        },
-        where: {
-          genres: {
-            id: In(splitQueryGenres),
-          },
-          price: Between(minPrice, maxPrice),
-        },
-        order: {
-          [sort]: "ASC",
-        }
-      };
-    }
-    const books = await bookBase.find(req.query !== {} ? queryForFind : null);
+        price: Between(+minPrice.toFixed(2), +maxPrice.toFixed(2)),
+      },
+      order: {
+        [sort]: "ASC",
+      }
+    });
   
+    
     res.status(200).json(books);
   } catch (e) {
     if (!e.text) {
