@@ -1,28 +1,14 @@
 import { Handler } from 'express';
-import generateError from '../../utils/generateError';
 import { bookBase } from '../../db';
 import { genreBase } from '../../db';
 import { Between, In } from 'typeorm';
+import { number } from 'yup/lib/locale';
 
 const getAllBooks: Handler = async (req, res, next) => {
   try {
     console.log('Query >>> ', req.query);
     const genres = await genreBase.find();
-    console.log( genres);
-
-    let splitQueryGenres = genres.map((item => item.id))
-    console.log(splitQueryGenres);
-    
-    let minPrice = 0;
-    let maxPrice = 10000;
-    let sort = '';
-    let queryForFind = {};
-
-    console.log('Genre  >>> ', typeof(req.query.genre));
-    console.log('Price >>> ', typeof(req.query.price));
-    console.log('Sort >>> ', typeof(req.query.sort));
-    
-
+    let splitQueryGenres = genres.map((item => item.id))    
     if (req.query.genre) {
       const genresFilter = `${req.query.genre}`.split(',')
       splitQueryGenres = []
@@ -32,19 +18,15 @@ const getAllBooks: Handler = async (req, res, next) => {
     }
     console.log('Genres >>> ', splitQueryGenres);
 
-    if (req.query.price) {
-      const prices = `${req.query.price}`.split(',')
-      minPrice = +prices[0] / 100;
-      maxPrice = +prices[1] / 100;
-    }
-    console.log('Min >>> ', minPrice);
-    console.log('Max >>> ', maxPrice);
-   
-    if (req.query.sort) {
-      sort = `${req.query.sort}`;
-    }
-    console.log(sort);
-    
+    let minPrice = +req.query.minPrice;
+    let maxPrice = +req.query.maxPrice;
+    let sort = '' || `${req.query.sort}`;
+
+    console.log('Genre  >>> ', Array.isArray(splitQueryGenres), splitQueryGenres);
+    console.log('minPrice >>> ', typeof(minPrice), minPrice);
+    console.log('maxPrice >>> ', typeof(maxPrice), maxPrice);
+    console.log('Sort >>> ', typeof(req.query.sort), sort);
+
 
     const books = await bookBase.find({
       select: {
@@ -56,15 +38,34 @@ const getAllBooks: Handler = async (req, res, next) => {
         genres: {
           id: In(splitQueryGenres),
         },
-        price: Between(+minPrice.toFixed(2), +maxPrice.toFixed(2)),
+        price: Between(+minPrice, +maxPrice),
       },
       order: {
         [sort]: "ASC",
       }
     });
   
+    let minPriceBook = 1000;
+    let maxPriceBook = 0;
+    const booksP = await bookBase.find()
+
+    for ( let i = 0; i < booksP.length; i++ ) {
+      let price = booksP[i].price;
+      console.log(price);
+      
+      if (price <= minPriceBook) {
+        minPriceBook = +price;
+        
+      }
+      if (price >= maxPriceBook) {
+        maxPriceBook = +price;
+        
+      }
+
+    }
+    console.log(books, minPriceBook, maxPriceBook);
     
-    res.status(200).json(books);
+    res.status(200).json({books, minPriceBook, maxPriceBook});
   } catch (e) {
     if (!e.text) {
       e.text = 'Error  getAllBooks service';
