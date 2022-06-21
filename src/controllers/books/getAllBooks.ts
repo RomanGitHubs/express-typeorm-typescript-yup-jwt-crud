@@ -21,11 +21,13 @@ const getAllBooks: Handler = async (req, res, next) => {
     let minPrice = +req.query.minPrice;
     let maxPrice = +req.query.maxPrice;
     let sort = '' || `${req.query.sort}`;
+    let order = '' || req.query.order;
 
-    console.log('Genre  >>> ', Array.isArray(splitQueryGenres), splitQueryGenres);
+    console.log('Genre  >>> ', splitQueryGenres, 'isArray? -', Array.isArray(splitQueryGenres));
     console.log('minPrice >>> ', typeof(minPrice), minPrice);
     console.log('maxPrice >>> ', typeof(maxPrice), maxPrice);
     console.log('Sort >>> ', typeof(req.query.sort), sort);
+    console.log('Order >>> ', typeof(req.query.order), order);
 
 
     const books = await bookBase.find({
@@ -41,7 +43,7 @@ const getAllBooks: Handler = async (req, res, next) => {
         price: Between(+minPrice, +maxPrice),
       },
       order: {
-        [sort]: "ASC",
+        [sort]: order,
       }
     });
   
@@ -59,7 +61,6 @@ const getAllBooks: Handler = async (req, res, next) => {
       }
       if (price >= maxPriceBook) {
         maxPriceBook = +price;
-        
       }
 
     }
